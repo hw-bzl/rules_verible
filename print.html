@@ -198,13 +198,47 @@ verilog_library(name = "adder", srcs = ["adder.sv"])
 verible_format_test(name = "adder_format_test", target = ":adder")
 verible_lint_test(name = "adder_lint_test", target = ":adder")
 </code></pre>
-<p>Run the checks as aspects across the whole repo:</p>
-<pre><code class="language-bash">bazel build --config=verible //...
+<h2 id="enabling-the-aspects-in-your-bazelrc"><a class="header" href="#enabling-the-aspects-in-your-bazelrc">Enabling the aspects in your <code>.bazelrc</code></a></h2>
+<p>The aspect-driven checks (the <code>--config=verible_format</code>, <code>--config=verible_lint</code>,
+and combined <code>--config=verible</code> flags) are not auto-registered downstream. Add
+the following block to your repo's <code>.bazelrc</code> to opt in:</p>
+<pre><code class="language-text"># Enable verible-verilog-format checks for all targets in the workspace.
+# Usage: bazel build --config=verible_format //...
+build:verible_format --aspects=@rules_verible//verible:verible_format_aspect.bzl%verible_format_aspect
+build:verible_format --output_groups=+verible_format_checks
+
+# Enable verible-verilog-lint checks for all targets in the workspace.
+# Usage: bazel build --config=verible_lint //...
+build:verible_lint --aspects=@rules_verible//verible:verible_lint_aspect.bzl%verible_lint_aspect
+build:verible_lint --output_groups=+verible_lint_checks
+
+# Composite: run both at once.
+# Usage: bazel build --config=verible //...
+build:verible --config=verible_format
+build:verible --config=verible_lint
 </code></pre>
+<p>Aspects propagate across every transitive <code>VerilogInfo</code>-providing dependency,
+so a single <code>bazel build --config=verible //some:top_target</code> checks the whole
+graph reachable from <code>//some:top_target</code>. To exclude a <code>verilog_library</code> from
+the sweep, tag it with one of:</p>
+<div class="table-wrapper"><table><thead><tr><th>Tag</th><th>Effect</th></tr></thead><tbody>
+<tr><td><code>noformat</code></td><td>Skip the format aspect.</td></tr>
+<tr><td><code>no-format</code></td><td>Same as <code>noformat</code>.</td></tr>
+<tr><td><code>no-verible-format</code></td><td>Same; verible-specific spelling.</td></tr>
+<tr><td><code>nolint</code></td><td>Skip the lint aspect.</td></tr>
+<tr><td><code>no-lint</code></td><td>Same as <code>nolint</code>.</td></tr>
+<tr><td><code>no-verible-lint</code></td><td>Same; verible-specific spelling.</td></tr>
+</tbody></table>
+</div>
+<p>The <code>bazel run //verible:format_fix</code> / <code>lint_fix</code> fixer binaries honor the same
+tag set when discovering Verilog sources via <code>bazel query</code>.</p>
+<h2 id="where-the-verible-binaries-come-from"><a class="header" href="#where-the-verible-binaries-come-from">Where the Verible binaries come from</a></h2>
 <p>Verible binaries come from the upstream
 <a href="https://github.com/chipsalliance/verible/releases">GitHub releases</a> via a
 module extension; supported platforms are linux x86_64, linux aarch64, macOS,
-and windows x86_64.</p>
+and windows x86_64. To override (e.g. point at a system-installed or vendored
+Verible), register your own <code>verible_toolchain(...)</code> instance ahead of the
+defaults — see the <a href="./verible_toolchain.html"><code>verible_toolchain</code></a> page.</p>
 <div style="break-before: page; page-break-before: always;"></div><h1 id="rules"><a class="header" href="#rules">Rules</a></h1>
 <ul>
 <li><a href="./verible_toolchain.html">verible_toolchain</a></li>
@@ -213,7 +247,6 @@ and windows x86_64.</p>
 <li><a href="./verible_lint_aspect.html">verible_lint_aspect</a></li>
 <li><a href="./verible_lint_test.html">verible_lint_test</a></li>
 <li><a href="./verible_diff_test.html">verible_diff_test</a></li>
-<li><a href="./verible_defs.html">defs.bzl re-exports</a></li>
 </ul>
 <div style="break-before: page; page-break-before: always;"></div><!-- Generated with Stardoc: http://skydoc.bazel.build -->
 <p>The <code>verible_toolchain</code> rule and <code>current_verible_toolchain</code> helper.</p>
@@ -344,111 +377,7 @@ report is emitted to the test log.</p>
 <tr><td style="text-align: left"><a id="verible_diff_test-file2"></a>file2</td><td style="text-align: left">The second Verilog/SystemVerilog source file.</td><td style="text-align: left"><a href="https://bazel.build/concepts/labels">Label</a></td><td style="text-align: left">required</td><td style="text-align: left"></td></tr>
 <tr><td style="text-align: left"><a id="verible_diff_test-mode"></a>mode</td><td style="text-align: left">Diff mode passed to <code>verible-verilog-diff --mode=...</code>.</td><td style="text-align: left">String</td><td style="text-align: left">optional</td><td style="text-align: left"><code>"format"</code></td></tr>
 </tbody></table>
-</div><div style="break-before: page; page-break-before: always;"></div><!-- Generated with Stardoc: http://skydoc.bazel.build -->
-<p>Public entry point for <code>rules_verible</code>.</p>
-<h2 id="rules-5"><a class="header" href="#rules-5">Rules</a></h2>
-<ul>
-<li><a href="verible_defs.html#verible_diff_test">verible_diff_test</a></li>
-<li><a href="verible_defs.html#verible_format_test">verible_format_test</a></li>
-<li><a href="verible_defs.html#verible_lint_test">verible_lint_test</a></li>
-<li><a href="verible_defs.html#verible_toolchain">verible_toolchain</a></li>
-</ul>
-<h2 id="aspects-2"><a class="header" href="#aspects-2">Aspects</a></h2>
-<ul>
-<li><a href="verible_defs.html#verible_format_aspect">verible_format_aspect</a></li>
-<li><a href="verible_defs.html#verible_lint_aspect">verible_lint_aspect</a></li>
-</ul>
-<p><a id="verible_diff_test"></a></p>
-<h2 id="verible_diff_test-1"><a class="header" href="#verible_diff_test-1">verible_diff_test</a></h2>
-<pre>
-load("@rules_verible//verible:defs.bzl", "verible_diff_test")
-
-verible_diff_test(<a href="verible_defs.html#verible_diff_test-name">name</a>, <a href="verible_defs.html#verible_diff_test-file1">file1</a>, <a href="verible_defs.html#verible_diff_test-file2">file2</a>, <a href="verible_defs.html#verible_diff_test-mode">mode</a>)
-</pre>
-<p>Test rule that runs <code>verible-verilog-diff</code> between two Verilog sources.</p>
-<p>By default the comparison uses <code>format</code> mode, which ignores whitespace and
-compares token texts — useful for verifying that some transformed source still
-parses to the same tokens as a golden reference. Set <code>mode = "obfuscate"</code> to
-compare token-text <em>lengths</em> only, the standard recipe for verifying
-<code>verible-verilog-obfuscate</code> output.</p>
-<p>The test exits 0 when the sources are equivalent under the chosen mode, and
-with the diff binary's non-zero status (1) otherwise; the per-token mismatch
-report is emitted to the test log.</p>
-<p><strong>ATTRIBUTES</strong></p>
-<div class="table-wrapper"><table><thead><tr><th style="text-align: left">Name</th><th style="text-align: left">Description</th><th style="text-align: left">Type</th><th style="text-align: left">Mandatory</th><th style="text-align: left">Default</th></tr></thead><tbody>
-<tr><td style="text-align: left"><a id="verible_diff_test-name"></a>name</td><td style="text-align: left">A unique name for this target.</td><td style="text-align: left"><a href="https://bazel.build/concepts/labels#target-names">Name</a></td><td style="text-align: left">required</td><td style="text-align: left"></td></tr>
-<tr><td style="text-align: left"><a id="verible_diff_test-file1"></a>file1</td><td style="text-align: left">The first Verilog/SystemVerilog source file.</td><td style="text-align: left"><a href="https://bazel.build/concepts/labels">Label</a></td><td style="text-align: left">required</td><td style="text-align: left"></td></tr>
-<tr><td style="text-align: left"><a id="verible_diff_test-file2"></a>file2</td><td style="text-align: left">The second Verilog/SystemVerilog source file.</td><td style="text-align: left"><a href="https://bazel.build/concepts/labels">Label</a></td><td style="text-align: left">required</td><td style="text-align: left"></td></tr>
-<tr><td style="text-align: left"><a id="verible_diff_test-mode"></a>mode</td><td style="text-align: left">Diff mode passed to <code>verible-verilog-diff --mode=...</code>.</td><td style="text-align: left">String</td><td style="text-align: left">optional</td><td style="text-align: left"><code>"format"</code></td></tr>
-</tbody></table>
 </div>
-<p><a id="verible_format_test"></a></p>
-<h2 id="verible_format_test-1"><a class="header" href="#verible_format_test-1">verible_format_test</a></h2>
-<pre>
-load("@rules_verible//verible:defs.bzl", "verible_format_test")
-
-verible_format_test(<a href="verible_defs.html#verible_format_test-name">name</a>, <a href="verible_defs.html#verible_format_test-config">config</a>, <a href="verible_defs.html#verible_format_test-target">target</a>)
-</pre>
-<p>Test rule that runs <code>verible-verilog-format --verify</code> against a <code>VerilogInfo</code> target.</p>
-<p><strong>ATTRIBUTES</strong></p>
-<div class="table-wrapper"><table><thead><tr><th style="text-align: left">Name</th><th style="text-align: left">Description</th><th style="text-align: left">Type</th><th style="text-align: left">Mandatory</th><th style="text-align: left">Default</th></tr></thead><tbody>
-<tr><td style="text-align: left"><a id="verible_format_test-name"></a>name</td><td style="text-align: left">A unique name for this target.</td><td style="text-align: left"><a href="https://bazel.build/concepts/labels#target-names">Name</a></td><td style="text-align: left">required</td><td style="text-align: left"></td></tr>
-<tr><td style="text-align: left"><a id="verible_format_test-config"></a>config</td><td style="text-align: left">Optional verible-verilog-format flagfile.</td><td style="text-align: left"><a href="https://bazel.build/concepts/labels">Label</a></td><td style="text-align: left">optional</td><td style="text-align: left"><code>None</code></td></tr>
-<tr><td style="text-align: left"><a id="verible_format_test-target"></a>target</td><td style="text-align: left">The <code>verilog_library</code>-like target whose srcs should be format-checked.</td><td style="text-align: left"><a href="https://bazel.build/concepts/labels">Label</a></td><td style="text-align: left">required</td><td style="text-align: left"></td></tr>
-</tbody></table>
-</div>
-<p><a id="verible_lint_test"></a></p>
-<h2 id="verible_lint_test-1"><a class="header" href="#verible_lint_test-1">verible_lint_test</a></h2>
-<pre>
-load("@rules_verible//verible:defs.bzl", "verible_lint_test")
-
-verible_lint_test(<a href="verible_defs.html#verible_lint_test-name">name</a>, <a href="verible_defs.html#verible_lint_test-config">config</a>, <a href="verible_defs.html#verible_lint_test-target">target</a>)
-</pre>
-<p>Test rule that runs <code>verible-verilog-lint</code> against a <code>VerilogInfo</code> target.</p>
-<p><strong>ATTRIBUTES</strong></p>
-<div class="table-wrapper"><table><thead><tr><th style="text-align: left">Name</th><th style="text-align: left">Description</th><th style="text-align: left">Type</th><th style="text-align: left">Mandatory</th><th style="text-align: left">Default</th></tr></thead><tbody>
-<tr><td style="text-align: left"><a id="verible_lint_test-name"></a>name</td><td style="text-align: left">A unique name for this target.</td><td style="text-align: left"><a href="https://bazel.build/concepts/labels#target-names">Name</a></td><td style="text-align: left">required</td><td style="text-align: left"></td></tr>
-<tr><td style="text-align: left"><a id="verible_lint_test-config"></a>config</td><td style="text-align: left">Optional <code>.rules.verible_lint</code> configuration file.</td><td style="text-align: left"><a href="https://bazel.build/concepts/labels">Label</a></td><td style="text-align: left">optional</td><td style="text-align: left"><code>None</code></td></tr>
-<tr><td style="text-align: left"><a id="verible_lint_test-target"></a>target</td><td style="text-align: left">The <code>verilog_library</code>-like target whose srcs should be lint-checked.</td><td style="text-align: left"><a href="https://bazel.build/concepts/labels">Label</a></td><td style="text-align: left">required</td><td style="text-align: left"></td></tr>
-</tbody></table>
-</div>
-<p><a id="verible_toolchain"></a></p>
-<h2 id="verible_toolchain-1"><a class="header" href="#verible_toolchain-1">verible_toolchain</a></h2>
-<pre>
-load("@rules_verible//verible:defs.bzl", "verible_toolchain")
-
-verible_toolchain(<a href="verible_defs.html#verible_toolchain-name">name</a>, <a href="verible_defs.html#verible_toolchain-verible_diff">verible_diff</a>, <a href="verible_defs.html#verible_toolchain-verible_format">verible_format</a>, <a href="verible_defs.html#verible_toolchain-verible_lint">verible_lint</a>)
-</pre>
-<p>Toolchain providing the Verible verilog tools (<code>verible-verilog-format</code>, <code>verible-verilog-lint</code>, and <code>verible-verilog-diff</code>).</p>
-<p><strong>ATTRIBUTES</strong></p>
-<div class="table-wrapper"><table><thead><tr><th style="text-align: left">Name</th><th style="text-align: left">Description</th><th style="text-align: left">Type</th><th style="text-align: left">Mandatory</th><th style="text-align: left">Default</th></tr></thead><tbody>
-<tr><td style="text-align: left"><a id="verible_toolchain-name"></a>name</td><td style="text-align: left">A unique name for this target.</td><td style="text-align: left"><a href="https://bazel.build/concepts/labels#target-names">Name</a></td><td style="text-align: left">required</td><td style="text-align: left"></td></tr>
-<tr><td style="text-align: left"><a id="verible_toolchain-verible_diff"></a>verible_diff</td><td style="text-align: left">The <code>verible-verilog-diff</code> binary.</td><td style="text-align: left"><a href="https://bazel.build/concepts/labels">Label</a></td><td style="text-align: left">required</td><td style="text-align: left"></td></tr>
-<tr><td style="text-align: left"><a id="verible_toolchain-verible_format"></a>verible_format</td><td style="text-align: left">The <code>verible-verilog-format</code> binary.</td><td style="text-align: left"><a href="https://bazel.build/concepts/labels">Label</a></td><td style="text-align: left">required</td><td style="text-align: left"></td></tr>
-<tr><td style="text-align: left"><a id="verible_toolchain-verible_lint"></a>verible_lint</td><td style="text-align: left">The <code>verible-verilog-lint</code> binary.</td><td style="text-align: left"><a href="https://bazel.build/concepts/labels">Label</a></td><td style="text-align: left">required</td><td style="text-align: left"></td></tr>
-</tbody></table>
-</div>
-<p><a id="verible_format_aspect"></a></p>
-<h2 id="verible_format_aspect-1"><a class="header" href="#verible_format_aspect-1">verible_format_aspect</a></h2>
-<pre>
-load("@rules_verible//verible:defs.bzl", "verible_format_aspect")
-
-verible_format_aspect()
-</pre>
-<p>Aspect that runs <code>verible-verilog-format --verify</code> on every <code>VerilogInfo</code> target.</p>
-<p><strong>ASPECT ATTRIBUTES</strong></p>
-<p><strong>ATTRIBUTES</strong></p>
-<p><a id="verible_lint_aspect"></a></p>
-<h2 id="verible_lint_aspect-1"><a class="header" href="#verible_lint_aspect-1">verible_lint_aspect</a></h2>
-<pre>
-load("@rules_verible//verible:defs.bzl", "verible_lint_aspect")
-
-verible_lint_aspect()
-</pre>
-<p>Aspect that runs <code>verible-verilog-lint</code> on every <code>VerilogInfo</code> target.</p>
-<p><strong>ASPECT ATTRIBUTES</strong></p>
-<p><strong>ATTRIBUTES</strong></p>
-
                     </main>
 
                     <nav class="nav-wrapper" aria-label="Page navigation">
