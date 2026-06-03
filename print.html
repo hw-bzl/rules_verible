@@ -127,7 +127,7 @@
                         <a href="print.html" title="Print this book" aria-label="Print this book">
                             <i id="print-button" class="fa fa-print"></i>
                         </a>
-                        <a href="https://github.com/andrebrisco/rules_verible" title="Git repository" aria-label="Git repository">
+                        <a href="https://github.com/hw-bzl/rules_verible" title="Git repository" aria-label="Git repository">
                             <i id="git-repository-button" class="fa fa-github"></i>
                         </a>
 
@@ -249,14 +249,7 @@ defaults — see the <a href="./verible_toolchain.html"><code>verible_toolchain<
 <li><a href="./verible_diff_test.html">verible_diff_test</a></li>
 </ul>
 <div style="break-before: page; page-break-before: always;"></div><!-- Generated with Stardoc: http://skydoc.bazel.build -->
-<p>The <code>verible_toolchain</code> rule and <code>current_verible_toolchain</code> helper.</p>
-<p>A single toolchain holds every Verible binary <code>rules_verible</code> knows about.
-The format and lint pipelines both consume <code>//verible:toolchain_type</code> and
-reach into the same <code>ToolchainInfo</code> for whichever binary they need.</p>
-<p><code>current_verible_toolchain</code> is a rule that resolves the registered toolchain
-and re-exposes it (DefaultInfo + TemplateVariableInfo) so a <code>cc_binary</code> can
-pull the binary into runfiles and reference its rlocationpath via
-<code>$(VERIBLE_FORMAT_RLOCATIONPATH)</code> / <code>$(VERIBLE_LINT_RLOCATIONPATH)</code>.</p>
+<h1 id="verible_toolchain-rule"><a class="header" href="#verible_toolchain-rule"><code>verible_toolchain</code> rule</a></h1>
 <h2 id="rules-1"><a class="header" href="#rules-1">Rules</a></h2>
 <ul>
 <li><a href="verible_toolchain.html#verible_toolchain">verible_toolchain</a></li>
@@ -268,7 +261,21 @@ load("@rules_verible//verible:verible_toolchain.bzl", "verible_toolchain")
 
 verible_toolchain(<a href="verible_toolchain.html#verible_toolchain-name">name</a>, <a href="verible_toolchain.html#verible_toolchain-verible_diff">verible_diff</a>, <a href="verible_toolchain.html#verible_toolchain-verible_format">verible_format</a>, <a href="verible_toolchain.html#verible_toolchain-verible_lint">verible_lint</a>)
 </pre>
-<p>Toolchain providing the Verible verilog tools (<code>verible-verilog-format</code>, <code>verible-verilog-lint</code>, and <code>verible-verilog-diff</code>).</p>
+<p>A toolchain that exposes the <a href="https://github.com/chipsalliance/verible">Verible</a> tools.</p>
+<p>A single instance holds every Verible binary <code>rules_verible</code> knows about
+(<code>verible-verilog-format</code>, <code>verible-verilog-lint</code>, <code>verible-verilog-diff</code>).
+The format, lint, and diff pipelines all consume the same
+<code>//verible:toolchain_type</code> and pull whichever binary they need from the
+resolved <code>ToolchainInfo</code>.</p>
+<p>The rule also provides <code>platform_common.TemplateVariableInfo</code> exposing
+<code>VERIBLE_FORMAT_RLOCATIONPATH</code>, <code>VERIBLE_LINT_RLOCATIONPATH</code>, and
+<code>VERIBLE_DIFF_RLOCATIONPATH</code>, so a downstream <code>cc_binary</code> can reference each
+binary's runfiles key via <code>env = {"VERIBLE_..._RLOCATIONPATH": "$(VERIBLE_..._RLOCATIONPATH)"}</code>.</p>
+<p>The default toolchain registered by <code>//verible/toolchain:all</code> points at the
+prebuilt Verible releases for linux x86_64, linux aarch64, macOS, and
+windows x86_64. To override (e.g. point at a vendored or system-installed
+Verible), instantiate this rule yourself and <code>register_toolchains(...)</code> it
+ahead of the defaults in your <code>MODULE.bazel</code>.</p>
 <p><strong>ATTRIBUTES</strong></p>
 <div class="table-wrapper"><table><thead><tr><th style="text-align: left">Name</th><th style="text-align: left">Description</th><th style="text-align: left">Type</th><th style="text-align: left">Mandatory</th><th style="text-align: left">Default</th></tr></thead><tbody>
 <tr><td style="text-align: left"><a id="verible_toolchain-name"></a>name</td><td style="text-align: left">A unique name for this target.</td><td style="text-align: left"><a href="https://bazel.build/concepts/labels#target-names">Name</a></td><td style="text-align: left">required</td><td style="text-align: left"></td></tr>
@@ -277,7 +284,7 @@ verible_toolchain(<a href="verible_toolchain.html#verible_toolchain-name">name</
 <tr><td style="text-align: left"><a id="verible_toolchain-verible_lint"></a>verible_lint</td><td style="text-align: left">The <code>verible-verilog-lint</code> binary.</td><td style="text-align: left"><a href="https://bazel.build/concepts/labels">Label</a></td><td style="text-align: left">required</td><td style="text-align: left"></td></tr>
 </tbody></table>
 </div><div style="break-before: page; page-break-before: always;"></div><!-- Generated with Stardoc: http://skydoc.bazel.build -->
-<p>Public re-export of <code>verible_format_aspect</code> (consumed by .bazelrc).</p>
+<h1 id="verible_format_aspect-rule"><a class="header" href="#verible_format_aspect-rule"><code>verible_format_aspect</code> rule</a></h1>
 <h2 id="aspects"><a class="header" href="#aspects">Aspects</a></h2>
 <ul>
 <li><a href="verible_format_aspect.html#verible_format_aspect">verible_format_aspect</a></li>
@@ -293,7 +300,7 @@ verible_format_aspect()
 <p><strong>ASPECT ATTRIBUTES</strong></p>
 <p><strong>ATTRIBUTES</strong></p>
 <div style="break-before: page; page-break-before: always;"></div><!-- Generated with Stardoc: http://skydoc.bazel.build -->
-<p>Public re-export of <code>verible_format_test</code>.</p>
+<h1 id="verible_format_test-rule"><a class="header" href="#verible_format_test-rule"><code>verible_format_test</code> rule</a></h1>
 <h2 id="rules-2"><a class="header" href="#rules-2">Rules</a></h2>
 <ul>
 <li><a href="verible_format_test.html#verible_format_test">verible_format_test</a></li>
@@ -313,7 +320,7 @@ verible_format_test(<a href="verible_format_test.html#verible_format_test-name">
 <tr><td style="text-align: left"><a id="verible_format_test-target"></a>target</td><td style="text-align: left">The <code>verilog_library</code>-like target whose srcs should be format-checked.</td><td style="text-align: left"><a href="https://bazel.build/concepts/labels">Label</a></td><td style="text-align: left">required</td><td style="text-align: left"></td></tr>
 </tbody></table>
 </div><div style="break-before: page; page-break-before: always;"></div><!-- Generated with Stardoc: http://skydoc.bazel.build -->
-<p>Public re-export of <code>verible_lint_aspect</code> (consumed by .bazelrc).</p>
+<h1 id="verible_lint_aspect-aspect"><a class="header" href="#verible_lint_aspect-aspect"><code>verible_lint_aspect</code> aspect</a></h1>
 <h2 id="aspects-1"><a class="header" href="#aspects-1">Aspects</a></h2>
 <ul>
 <li><a href="verible_lint_aspect.html#verible_lint_aspect">verible_lint_aspect</a></li>
@@ -329,7 +336,7 @@ verible_lint_aspect()
 <p><strong>ASPECT ATTRIBUTES</strong></p>
 <p><strong>ATTRIBUTES</strong></p>
 <div style="break-before: page; page-break-before: always;"></div><!-- Generated with Stardoc: http://skydoc.bazel.build -->
-<p>Public re-export of <code>verible_lint_test</code>.</p>
+<h1 id="verible_lint_test-rule"><a class="header" href="#verible_lint_test-rule"><code>verible_lint_test</code> rule</a></h1>
 <h2 id="rules-3"><a class="header" href="#rules-3">Rules</a></h2>
 <ul>
 <li><a href="verible_lint_test.html#verible_lint_test">verible_lint_test</a></li>
@@ -349,7 +356,7 @@ verible_lint_test(<a href="verible_lint_test.html#verible_lint_test-name">name</
 <tr><td style="text-align: left"><a id="verible_lint_test-target"></a>target</td><td style="text-align: left">The <code>verilog_library</code>-like target whose srcs should be lint-checked.</td><td style="text-align: left"><a href="https://bazel.build/concepts/labels">Label</a></td><td style="text-align: left">required</td><td style="text-align: left"></td></tr>
 </tbody></table>
 </div><div style="break-before: page; page-break-before: always;"></div><!-- Generated with Stardoc: http://skydoc.bazel.build -->
-<p>Public re-export of <code>verible_diff_test</code>.</p>
+<h1 id="verible_diff_test-rule"><a class="header" href="#verible_diff_test-rule"><code>verible_diff_test</code> rule</a></h1>
 <h2 id="rules-4"><a class="header" href="#rules-4">Rules</a></h2>
 <ul>
 <li><a href="verible_diff_test.html#verible_diff_test">verible_diff_test</a></li>
