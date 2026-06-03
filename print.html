@@ -162,11 +162,11 @@ SystemVerilog/Verilog tools — <code>verible-verilog-format</code>, <code>verib
 and <code>verible-verilog-diff</code> — for projects that build with
 <a href="https://github.com/hw-bzl/rules_verilog">rules_verilog</a>.</p>
 <h2 id="overview"><a class="header" href="#overview">Overview</a></h2>
-<p><code>rules_verible</code> follows the same shape as
-<a href="https://github.com/periareon/rules_venv">rules_venv</a>: each tool ships as a
-combination of an aspect (run via <code>bazel build --config=...</code>), a test rule, and
-a fixer binary (run via <code>bazel run</code>). Process wrappers are written in C++
-(POSIX + Win32) so the rule set doesn't drag in a Python interpreter.</p>
+<p>Each tool ships as a combination of an aspect (run via
+<code>bazel build --config=...</code>), a test rule, and a fixer binary (run via
+<code>bazel run</code>). Process wrappers are written in C++ (POSIX + Win32) so the rule
+set works on every platform Verible itself ships for, with no scripting-language
+dependency.</p>
 <ul>
 <li><strong><code>verible_toolchain</code></strong> — registers the three Verible binaries
 (<code>verible-verilog-format</code>, <code>verible-verilog-lint</code>, <code>verible-verilog-diff</code>).
