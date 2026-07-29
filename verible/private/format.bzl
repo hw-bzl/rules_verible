@@ -5,7 +5,7 @@ load("//verible:verible_toolchain.bzl", "TOOLCHAIN_TYPE")
 load("//verible/private:target_srcs.bzl", "find_srcs")
 
 # Skip targets carrying any of these tags.
-_SKIP_TAGS = ["noformat", "no-format", "no-verible-format"]
+_SKIP_TAGS = ["noformat", "no-format", "no-verible-format", "no-verible"]
 
 def _has_skip_tag(ctx):
     tags = getattr(ctx.rule.attr, "tags", [])

@@ -26,18 +26,26 @@ verible_toolchain_alias(
     visibility = ["//visibility:public"],
 )
 
-# `bazel run //verible:format_fix -- //...` rewrites Verilog sources in place
-# via `verible-verilog-format --inplace`.
 alias(
     name = "format_fix",
     actual = "//verible/private:verible_format_fixer",
     visibility = ["//visibility:public"],
 )
 
-# `bazel run //verible:lint_fix -- //...` applies lint autofixes in place via
-# `verible-verilog-lint --autofix=inplace`.
+alias(
+    name = "format",
+    actual = "//verible/private:verible_format_fixer",
+    visibility = ["//visibility:public"],
+)
+
 alias(
     name = "lint_fix",
+    actual = "//verible/private:verible_lint_fixer",
+    visibility = ["//visibility:public"],
+)
+
+alias(
+    name = "fix",
     actual = "//verible/private:verible_lint_fixer",
     visibility = ["//visibility:public"],
 )

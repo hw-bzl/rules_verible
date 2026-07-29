@@ -38,7 +38,7 @@ _PLATFORMS = {
     ),
 }
 
-def _verible_impl(_ctx):
+def _verible_impl(ctx):
     for repo_name, (asset_template, strip_template, sha256) in _PLATFORMS.items():
         asset = asset_template.format(ver = _VERIBLE_VERSION)
         http_archive(
@@ -48,6 +48,7 @@ def _verible_impl(_ctx):
             strip_prefix = strip_template.format(ver = _VERIBLE_VERSION),
             build_file = "@rules_verible//verible/private:BUILD.verible.bazel",
         )
+    return ctx.extension_metadata(reproducible = True)
 
 verible = module_extension(
     doc = "TODO",

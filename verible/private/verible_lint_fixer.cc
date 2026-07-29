@@ -2,8 +2,9 @@
 /// @brief Workspace linter autofixer invoked via `bazel run //verible:lint_fix`.
 ///
 /// @details
-///   Discovers every Verilog source file in the workspace via `bazel query`
-///   and runs `verible-verilog-lint --autofix=inplace` over them. The verible
+///   Discovers every Verilog source file that is a direct dep of a
+///   `verilog_*` rule in scope via `bazel query` and runs
+///   `verible-verilog-lint --autofix=inplace` over them. The verible
 ///   binary is resolved through the runfiles library; the
 ///   `VERIBLE_LINT_RLOCATIONPATH` env var supplies its runfiles lookup key
 ///   (set by the `cc_binary`'s `env` attribute via the
@@ -124,13 +125,15 @@ int main(int argc, char** argv) {
     scope_set += scope[i];
   }
   const std::string tag_pattern =
-      R"((^\[|, )(nolint|no-lint|no-verible-lint)(, |\]$))";
+      R"((^\[|, )(nolint|no-lint|no-verible-lint|no-verible)(, |\]$))";
   const std::string file_pattern = R"(^//.*\.(sv|svh|v|vh)$)";
+  const std::string verilog_rules =
+      "kind(\"^verilog_.* rule$\", set(" + scope_set + "))";
   std::string query =
       "filter(\"" + file_pattern + "\","
       " kind(\"source file\","
-      " deps(set(" + scope_set + ") except attr(tags, \"" + tag_pattern +
-      "\", set(" + scope_set + ")), 1)))";
+      " deps(" + verilog_rules + " except attr(tags, \"" + tag_pattern +
+      "\", " + verilog_rules + "), 1)))";
 
   std::vector<std::string> query_cmd = {
       bazel, "query", query,

@@ -4,7 +4,7 @@ load("@rules_verilog//verilog:defs.bzl", "VerilogInfo")
 load("//verible:verible_toolchain.bzl", "TOOLCHAIN_TYPE")
 load("//verible/private:target_srcs.bzl", "find_srcs")
 
-_SKIP_TAGS = ["nolint", "no-lint", "no-verible-lint"]
+_SKIP_TAGS = ["nolint", "no-lint", "no-verible-lint", "no-verible"]
 
 def _has_skip_tag(ctx):
     tags = getattr(ctx.rule.attr, "tags", [])

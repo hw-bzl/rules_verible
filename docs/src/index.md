@@ -88,6 +88,7 @@ the sweep, tag it with one of:
 | `nolint`             | Skip the lint aspect.           |
 | `no-lint`            | Same as `nolint`.               |
 | `no-verible-lint`    | Same; verible-specific spelling.|
+| `no-verible`         | Skip both aspects.              |
 
 The `bazel run //verible:format_fix` / `lint_fix` fixer binaries honor the same
 tag set when discovering Verilog sources via `bazel query`.
