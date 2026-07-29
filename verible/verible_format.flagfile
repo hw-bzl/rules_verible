@@ -1,0 +1,10 @@
+# Default Abseil flagfile for verible-verilog-format shipped with rules_verible.
+#
+# This file is intentionally empty — it does NOT set any flags. Downstream
+# consumers should provide their own flagfile(s) and point the
+# //verible:format_flagfiles label_flag at a filegroup containing them:
+#
+#   build --@rules_verible//verible:format_flagfiles=//path/to:my_format_flagfiles
+#
+# Available flags: `verible-verilog-format --help`.
+# Format: one `--flag=value` per line; `#` starts a comment.

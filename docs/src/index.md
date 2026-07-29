@@ -52,6 +52,46 @@ verible_format_test(name = "adder_format_test", target = ":adder")
 verible_lint_test(name = "adder_lint_test", target = ":adder")
 ```
 
+## Providing a Verible config
+
+Three `label_flag`s in `@rules_verible//verible` control what config the
+aspects and test rules pass to Verible. Their defaults are no-op files, so out
+of the box nothing changes; point any of them at your own file(s) to apply
+project-wide settings:
+
+| Flag                                            | Feeds Verible as        | Type              |
+|-------------------------------------------------|-------------------------|-------------------|
+| `@rules_verible//verible:rules_config`          | `--rules_config=<file>` | single file       |
+| `@rules_verible//verible:lint_flagfiles`        | `--flagfile=<file>` ×N  | filegroup (0..N)  |
+| `@rules_verible//verible:format_flagfiles`      | `--flagfile=<file>` ×N  | filegroup (0..N)  |
+
+Wire them up in `.bazelrc`:
+
+```text
+build --@rules_verible//verible:rules_config=//tools/verible:project.rules_config
+build --@rules_verible//verible:lint_flagfiles=//tools/verible:lint_flagfiles
+build --@rules_verible//verible:format_flagfiles=//tools/verible:format_flagfiles
+```
+
+Where the filegroup targets look like:
+
+```python
+filegroup(name = "lint_flagfiles",   srcs = ["base.flagfile", "team.flagfile"])
+filegroup(name = "format_flagfiles", srcs = ["format.flagfile"])
+```
+
+Individual test targets can override the flag defaults per target. `flagfiles`
+takes a single label — either a file or a filegroup wrapping multiple files:
+
+```python
+verible_lint_test(
+    name = "adder_lint_test",
+    target = ":adder",
+    rules_config = "//tools/verible:stricter.rules_config",
+    flagfiles    = "//tools/verible:extra.flagfile",
+)
+```
+
 ## Enabling the aspects in your `.bazelrc`
 
 The aspect-driven checks (the `--config=verible_format`, `--config=verible_lint`,

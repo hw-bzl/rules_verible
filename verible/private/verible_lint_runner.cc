@@ -11,8 +11,9 @@
 ///   - **Test mode**: the env var `VERIBLE_LINT_TEST_ARGS_FILE` holds the
 ///     runfiles key of an args file. The runner resolves that file via
 ///     `@rules_cc//cc/runfiles`, then resolves every PATH-valued flag inside
-///     (`--verible-lint=`, `--src=`, `--config=`) the same way. This path
-///     works in both symlink-tree and manifest-only runfiles modes.
+///     (`--verible-lint=`, `--src=`, `--rules-config=`, `--flagfile=`) the
+///     same way. This path works in both symlink-tree and manifest-only
+///     runfiles modes.
 ///   - **Aspect / CLI mode**: argv (or `@argfile`) holds literal sandbox paths
 ///     directly, exactly as Bazel built them.
 ///
@@ -21,7 +22,8 @@
 ///   |-------------------------|------------------------------------------------------|
 ///   | `--verible-lint=PATH`   | (required) Path to the verible-verilog-lint binary.  |
 ///   | `--marker=PATH`         | (optional) File to touch on success.                 |
-///   | `--config=PATH`         | (optional) Passed through as `--rules_config=PATH`.  |
+///   | `--rules-config=PATH`   | (optional) Passed through as `--rules_config=PATH`.  |
+///   | `--flagfile=PATH`       | (repeatable) Passed through as `--flagfile=PATH`.    |
 ///   | `--src=PATH`            | (repeatable) Source file to lint.                    |
 ///   | `--`                    | End of options.                                      |
 ///   | `[extra]`               | Pass-through args appended to the verible command.   |
@@ -109,7 +111,8 @@ int main(int argc, char** argv) {
 
   std::string verible_bin;
   std::string marker;
-  std::string config;
+  std::string rules_config;
+  std::vector<std::string> flagfiles;
   std::vector<std::string> srcs;
   std::vector<std::string> passthrough;
   bool after_dashdash = false;
@@ -125,8 +128,10 @@ int main(int argc, char** argv) {
       verible_bin = maybe_resolve(runfiles.get(), flag_value(a, "--verible-lint"));
     } else if (starts_with(a, "--marker=")) {
       marker = flag_value(a, "--marker");
-    } else if (starts_with(a, "--config=")) {
-      config = maybe_resolve(runfiles.get(), flag_value(a, "--config"));
+    } else if (starts_with(a, "--rules-config=")) {
+      rules_config = maybe_resolve(runfiles.get(), flag_value(a, "--rules-config"));
+    } else if (starts_with(a, "--flagfile=")) {
+      flagfiles.push_back(maybe_resolve(runfiles.get(), flag_value(a, "--flagfile")));
     } else if (starts_with(a, "--src=")) {
       srcs.push_back(maybe_resolve(runfiles.get(), flag_value(a, "--src")));
     } else {
@@ -138,9 +143,10 @@ int main(int argc, char** argv) {
   if (srcs.empty()) die("at least one --src=PATH is required");
 
   std::vector<std::string> cmd;
-  cmd.reserve(srcs.size() + 4);
+  cmd.reserve(srcs.size() + flagfiles.size() + 4);
   cmd.push_back(verible_bin);
-  if (!config.empty()) cmd.push_back("--rules_config=" + config);
+  if (!rules_config.empty()) cmd.push_back("--rules_config=" + rules_config);
+  for (const auto& f : flagfiles) cmd.push_back("--flagfile=" + f);
   for (const auto& s : srcs) cmd.push_back(s);
   for (const auto& p : passthrough) cmd.push_back(p);
 

@@ -12,7 +12,40 @@ exports_files(
         "verible_lint_aspect.bzl",
         "verible_lint_test.bzl",
         "verible_toolchain.bzl",
+        "verible_lint.rules_config",
+        "verible_lint.flagfile",
+        "verible_format.flagfile",
     ],
+    visibility = ["//visibility:public"],
+)
+
+filegroup(
+    name = "default_lint_flagfiles",
+    srcs = ["verible_lint.flagfile"],
+    visibility = ["//visibility:public"],
+)
+
+filegroup(
+    name = "default_format_flagfiles",
+    srcs = ["verible_format.flagfile"],
+    visibility = ["//visibility:public"],
+)
+
+label_flag(
+    name = "rules_config",
+    build_setting_default = ":verible_lint.rules_config",
+    visibility = ["//visibility:public"],
+)
+
+label_flag(
+    name = "lint_flagfiles",
+    build_setting_default = ":default_lint_flagfiles",
+    visibility = ["//visibility:public"],
+)
+
+label_flag(
+    name = "format_flagfiles",
+    build_setting_default = ":default_format_flagfiles",
     visibility = ["//visibility:public"],
 )
 

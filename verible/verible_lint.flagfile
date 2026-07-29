@@ -1,0 +1,10 @@
+# Default Abseil flagfile for verible-verilog-lint shipped with rules_verible.
+#
+# This file is intentionally empty — it does NOT set any flags. Downstream
+# consumers should provide their own flagfile(s) and point the
+# //verible:lint_flagfiles label_flag at a filegroup containing them:
+#
+#   build --@rules_verible//verible:lint_flagfiles=//path/to:my_lint_flagfiles
+#
+# Available flags: `verible-verilog-lint --help`.
+# Format: one `--flag=value` per line; `#` starts a comment.

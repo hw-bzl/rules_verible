@@ -1,0 +1,10 @@
+# Default rules-config for verible-verilog-lint shipped with rules_verible.
+#
+# This file is intentionally empty — it does NOT enable, disable, or override
+# any lint rules. Downstream consumers should provide their own rules-config
+# and point the //verible:rules_config label_flag at it:
+#
+#   build --@rules_verible//verible:rules_config=//path/to:my.rules_config
+#
+# Rule catalog: https://chipsalliance.github.io/verible/lint.html
+# Format: one directive per line, e.g. `-line-length` or `+line-length=100`.

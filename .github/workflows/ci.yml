@@ -31,10 +31,10 @@ jobs:
       - name: Run all tests
         env:
           USE_BAZEL_VERSION: ${{ matrix.bazel-version }}
-        run: bazel test //... --test_output=errors
+        run: bazel --bazelrc=.github/github.bazelrc test //...
 
       - name: Run example module tests
         env:
           USE_BAZEL_VERSION: ${{ matrix.bazel-version }}
         working-directory: examples/simple
-        run: bazel test //... --test_output=errors
+        run: bazel --bazelrc=../../.github/github.bazelrc test //...

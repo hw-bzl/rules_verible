@@ -31,9 +31,14 @@ def _verible_lint_aspect_impl(target, ctx):
     tc = ctx.toolchains[TOOLCHAIN_TYPE]
     marker = ctx.actions.declare_file("{}.verible_lint.ok".format(target.label.name))
 
+    rules_config = ctx.file._rules_config
+    flagfiles = ctx.files._flagfiles
+
     args = ctx.actions.args()
     args.add(tc.verible_lint, format = "--verible-lint=%s")
     args.add(marker, format = "--marker=%s")
+    args.add(rules_config, format = "--rules-config=%s")
+    args.add_all(flagfiles, format_each = "--flagfile=%s")
     args.add_all(srcs, format_each = "--src=%s")
     args.use_param_file("@%s", use_always = True)
     args.set_param_file_format("multiline")
@@ -41,7 +46,7 @@ def _verible_lint_aspect_impl(target, ctx):
     ctx.actions.run(
         executable = ctx.executable._runner,
         arguments = [args],
-        inputs = depset(srcs, transitive = [tc.all_files]),
+        inputs = depset(srcs + [rules_config] + flagfiles, transitive = [tc.all_files]),
         tools = [tc.verible_lint],
         outputs = [marker],
         mnemonic = "VeribleLint",
@@ -53,6 +58,14 @@ verible_lint_aspect = aspect(
     implementation = _verible_lint_aspect_impl,
     doc = "Aspect that runs `verible-verilog-lint` on every `VerilogInfo` target.",
     attrs = {
+        "_flagfiles": attr.label(
+            allow_files = True,
+            default = Label("//verible:lint_flagfiles"),
+        ),
+        "_rules_config": attr.label(
+            allow_single_file = True,
+            default = Label("//verible:rules_config"),
+        ),
         "_runner": attr.label(
             cfg = "exec",
             executable = True,
@@ -69,14 +82,18 @@ def _verible_lint_test_impl(ctx):
         fail("verible_lint_test.target has no first-party Verilog srcs: {}".format(target.label))
 
     tc = ctx.toolchains[TOOLCHAIN_TYPE]
-    config = ctx.file.config
+    rules_config = ctx.file.rules_config
+    flagfiles = ctx.files.flagfiles
     ws = ctx.workspace_name
 
     args = ctx.actions.args()
     args.set_param_file_format("multiline")
     args.add(_rlocationpath(tc.verible_lint, ws), format = "--verible-lint=%s")
-    if config:
-        args.add(_rlocationpath(config, ws), format = "--config=%s")
+    args.add(_rlocationpath(rules_config, ws), format = "--rules-config=%s")
+    args.add_all(
+        [_rlocationpath(f, ws) for f in flagfiles],
+        format_each = "--flagfile=%s",
+    )
     args.add_all(
         [_rlocationpath(src, ws) for src in srcs],
         format_each = "--src=%s",
@@ -103,7 +120,7 @@ def _verible_lint_test_impl(ctx):
 
     runner_default_runfiles = ctx.attr._runner[DefaultInfo].default_runfiles
     runfiles = ctx.runfiles(
-        files = list(srcs) + ([config] if config else []) + [
+        files = list(srcs) + [rules_config] + list(flagfiles) + [
             tc.verible_lint,
             ctx.executable._runner,
             args_file,
@@ -127,9 +144,15 @@ verible_lint_test = rule(
     implementation = _verible_lint_test_impl,
     doc = "Test rule that runs `verible-verilog-lint` against a `VerilogInfo` target.",
     attrs = {
-        "config": attr.label(
+        "flagfiles": attr.label(
+            allow_files = True,
+            default = Label("//verible:lint_flagfiles"),
+            doc = "Abseil flagfile(s) forwarded to `verible-verilog-lint` as one `--flagfile=` each. Defaults to the `//verible:lint_flagfiles` label_flag.",
+        ),
+        "rules_config": attr.label(
             allow_single_file = True,
-            doc = "Optional `.rules.verible_lint` configuration file.",
+            default = Label("//verible:rules_config"),
+            doc = "Rules-config file forwarded to `verible-verilog-lint` as `--rules_config=`. Defaults to the `//verible:rules_config` label_flag.",
         ),
         "target": attr.label(
             mandatory = True,

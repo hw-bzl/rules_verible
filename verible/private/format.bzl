@@ -32,9 +32,12 @@ def _verible_format_aspect_impl(target, ctx):
     tc = ctx.toolchains[TOOLCHAIN_TYPE]
     marker = ctx.actions.declare_file("{}.verible_format.ok".format(target.label.name))
 
+    flagfiles = ctx.files._flagfiles
+
     args = ctx.actions.args()
-    args.add("--verible-format=" + tc.verible_format.path)
-    args.add("--marker=" + marker.path)
+    args.add(tc.verible_format, format = "--verible-format=%s")
+    args.add(marker, format = "--marker=%s")
+    args.add_all(flagfiles, format_each = "--flagfile=%s")
     args.add_all(srcs, format_each = "--src=%s")
     args.use_param_file("@%s", use_always = True)
     args.set_param_file_format("multiline")
@@ -42,7 +45,7 @@ def _verible_format_aspect_impl(target, ctx):
     ctx.actions.run(
         executable = ctx.executable._runner,
         arguments = [args],
-        inputs = depset(srcs, transitive = [tc.all_files]),
+        inputs = depset(srcs + flagfiles, transitive = [tc.all_files]),
         tools = [tc.verible_format],
         outputs = [marker],
         mnemonic = "VeribleFormat",
@@ -54,6 +57,10 @@ verible_format_aspect = aspect(
     implementation = _verible_format_aspect_impl,
     doc = "Aspect that runs `verible-verilog-format --verify` on every `VerilogInfo` target.",
     attrs = {
+        "_flagfiles": attr.label(
+            allow_files = True,
+            default = Label("//verible:format_flagfiles"),
+        ),
         "_runner": attr.label(
             cfg = "exec",
             executable = True,
@@ -70,7 +77,7 @@ def _verible_format_test_impl(ctx):
         fail("verible_format_test.target has no first-party Verilog srcs: {}".format(target.label))
 
     tc = ctx.toolchains[TOOLCHAIN_TYPE]
-    config = ctx.file.config
+    flagfiles = ctx.files.flagfiles
     ws = ctx.workspace_name
 
     # Build the args file the runner reads at test time. Values are runfiles
@@ -79,8 +86,10 @@ def _verible_format_test_impl(ctx):
     args = ctx.actions.args()
     args.set_param_file_format("multiline")
     args.add(_rlocationpath(tc.verible_format, ws), format = "--verible-format=%s")
-    if config:
-        args.add(_rlocationpath(config, ws), format = "--config=%s")
+    args.add_all(
+        [_rlocationpath(f, ws) for f in flagfiles],
+        format_each = "--flagfile=%s",
+    )
     args.add_all(
         [_rlocationpath(src, ws) for src in srcs],
         format_each = "--src=%s",
@@ -109,7 +118,7 @@ def _verible_format_test_impl(ctx):
 
     runner_default_runfiles = ctx.attr._runner[DefaultInfo].default_runfiles
     runfiles = ctx.runfiles(
-        files = list(srcs) + ([config] if config else []) + [
+        files = list(srcs) + list(flagfiles) + [
             tc.verible_format,
             ctx.executable._runner,
             args_file,
@@ -133,9 +142,10 @@ verible_format_test = rule(
     implementation = _verible_format_test_impl,
     doc = "Test rule that runs `verible-verilog-format --verify` against a `VerilogInfo` target.",
     attrs = {
-        "config": attr.label(
-            allow_single_file = True,
-            doc = "Optional verible-verilog-format flagfile.",
+        "flagfiles": attr.label(
+            allow_files = True,
+            default = Label("//verible:format_flagfiles"),
+            doc = "Abseil flagfile(s) forwarded to `verible-verilog-format` as one `--flagfile=` each. Defaults to the `//verible:format_flagfiles` label_flag.",
         ),
         "target": attr.label(
             mandatory = True,
