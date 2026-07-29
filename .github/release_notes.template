@@ -7,5 +7,3 @@ bazel_dep(name = "rules_verible", version = "{version}")
 ```
 
 Additional documentation can be found at: https://github.com/hw-bzl/rules_verible
-
-SHA256: `{sha256_base64}`
