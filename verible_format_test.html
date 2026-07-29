@@ -166,13 +166,13 @@
 <pre>
 load("@rules_verible//verible:verible_format_test.bzl", "verible_format_test")
 
-verible_format_test(<a href="#verible_format_test-name">name</a>, <a href="#verible_format_test-config">config</a>, <a href="#verible_format_test-target">target</a>)
+verible_format_test(<a href="#verible_format_test-name">name</a>, <a href="#verible_format_test-flagfiles">flagfiles</a>, <a href="#verible_format_test-target">target</a>)
 </pre>
 <p>Test rule that runs <code>verible-verilog-format --verify</code> against a <code>VerilogInfo</code> target.</p>
 <p><strong>ATTRIBUTES</strong></p>
 <div class="table-wrapper"><table><thead><tr><th style="text-align: left">Name</th><th style="text-align: left">Description</th><th style="text-align: left">Type</th><th style="text-align: left">Mandatory</th><th style="text-align: left">Default</th></tr></thead><tbody>
 <tr><td style="text-align: left"><a id="verible_format_test-name"></a>name</td><td style="text-align: left">A unique name for this target.</td><td style="text-align: left"><a href="https://bazel.build/concepts/labels#target-names">Name</a></td><td style="text-align: left">required</td><td style="text-align: left"></td></tr>
-<tr><td style="text-align: left"><a id="verible_format_test-config"></a>config</td><td style="text-align: left">Optional verible-verilog-format flagfile.</td><td style="text-align: left"><a href="https://bazel.build/concepts/labels">Label</a></td><td style="text-align: left">optional</td><td style="text-align: left"><code>None</code></td></tr>
+<tr><td style="text-align: left"><a id="verible_format_test-flagfiles"></a>flagfiles</td><td style="text-align: left">Abseil flagfile(s) forwarded to <code>verible-verilog-format</code> as one <code>--flagfile=</code> each. Defaults to the <code>//verible:format_flagfiles</code> label_flag.</td><td style="text-align: left"><a href="https://bazel.build/concepts/labels">Label</a></td><td style="text-align: left">optional</td><td style="text-align: left"><code>"@rules_verible//verible:format_flagfiles"</code></td></tr>
 <tr><td style="text-align: left"><a id="verible_format_test-target"></a>target</td><td style="text-align: left">The <code>verilog_library</code>-like target whose srcs should be format-checked.</td><td style="text-align: left"><a href="https://bazel.build/concepts/labels">Label</a></td><td style="text-align: left">required</td><td style="text-align: left"></td></tr>
 </tbody></table>
 </div>

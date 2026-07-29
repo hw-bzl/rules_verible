@@ -166,13 +166,14 @@
 <pre>
 load("@rules_verible//verible:verible_lint_test.bzl", "verible_lint_test")
 
-verible_lint_test(<a href="#verible_lint_test-name">name</a>, <a href="#verible_lint_test-config">config</a>, <a href="#verible_lint_test-target">target</a>)
+verible_lint_test(<a href="#verible_lint_test-name">name</a>, <a href="#verible_lint_test-flagfiles">flagfiles</a>, <a href="#verible_lint_test-rules_config">rules_config</a>, <a href="#verible_lint_test-target">target</a>)
 </pre>
 <p>Test rule that runs <code>verible-verilog-lint</code> against a <code>VerilogInfo</code> target.</p>
 <p><strong>ATTRIBUTES</strong></p>
 <div class="table-wrapper"><table><thead><tr><th style="text-align: left">Name</th><th style="text-align: left">Description</th><th style="text-align: left">Type</th><th style="text-align: left">Mandatory</th><th style="text-align: left">Default</th></tr></thead><tbody>
 <tr><td style="text-align: left"><a id="verible_lint_test-name"></a>name</td><td style="text-align: left">A unique name for this target.</td><td style="text-align: left"><a href="https://bazel.build/concepts/labels#target-names">Name</a></td><td style="text-align: left">required</td><td style="text-align: left"></td></tr>
-<tr><td style="text-align: left"><a id="verible_lint_test-config"></a>config</td><td style="text-align: left">Optional <code>.rules.verible_lint</code> configuration file.</td><td style="text-align: left"><a href="https://bazel.build/concepts/labels">Label</a></td><td style="text-align: left">optional</td><td style="text-align: left"><code>None</code></td></tr>
+<tr><td style="text-align: left"><a id="verible_lint_test-flagfiles"></a>flagfiles</td><td style="text-align: left">Abseil flagfile(s) forwarded to <code>verible-verilog-lint</code> as one <code>--flagfile=</code> each. Defaults to the <code>//verible:lint_flagfiles</code> label_flag.</td><td style="text-align: left"><a href="https://bazel.build/concepts/labels">Label</a></td><td style="text-align: left">optional</td><td style="text-align: left"><code>"@rules_verible//verible:lint_flagfiles"</code></td></tr>
+<tr><td style="text-align: left"><a id="verible_lint_test-rules_config"></a>rules_config</td><td style="text-align: left">Rules-config file forwarded to <code>verible-verilog-lint</code> as <code>--rules_config=</code>. Defaults to the <code>//verible:rules_config</code> label_flag.</td><td style="text-align: left"><a href="https://bazel.build/concepts/labels">Label</a></td><td style="text-align: left">optional</td><td style="text-align: left"><code>"@rules_verible//verible:rules_config"</code></td></tr>
 <tr><td style="text-align: left"><a id="verible_lint_test-target"></a>target</td><td style="text-align: left">The <code>verilog_library</code>-like target whose srcs should be lint-checked.</td><td style="text-align: left"><a href="https://bazel.build/concepts/labels">Label</a></td><td style="text-align: left">required</td><td style="text-align: left"></td></tr>
 </tbody></table>
 </div>
