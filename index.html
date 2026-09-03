@@ -158,7 +158,7 @@
                         <h1 id="rules_verible"><a class="header" href="#rules_verible">rules_verible</a></h1>
 <p>Bazel rules that wrap the <a href="https://github.com/chipsalliance/verible">Verible</a>
 SystemVerilog/Verilog tools — <code>verible-verilog-format</code>, <code>verible-verilog-lint</code>,
-and <code>verible-verilog-diff</code> — for projects that build with
+<code>verible-verilog-diff</code>, and <code>verible-verilog-syntax</code> — for projects that build with
 <a href="https://github.com/hw-bzl/rules_verilog">rules_verilog</a>.</p>
 <h2 id="overview"><a class="header" href="#overview">Overview</a></h2>
 <p>Each tool ships as a combination of an aspect (run via
@@ -167,10 +167,10 @@ and <code>verible-verilog-diff</code> — for projects that build with
 set works on every platform Verible itself ships for, with no scripting-language
 dependency.</p>
 <ul>
-<li><strong><code>verible_toolchain</code></strong> — registers the three Verible binaries
-(<code>verible-verilog-format</code>, <code>verible-verilog-lint</code>, <code>verible-verilog-diff</code>).
-Default toolchains are auto-registered per-platform using prebuilt release
-tarballs.</li>
+<li><strong><code>verible_toolchain</code></strong> — registers the Verible binaries
+(<code>verible-verilog-format</code>, <code>verible-verilog-lint</code>, <code>verible-verilog-diff</code>,
+<code>verible-verilog-syntax</code>). Default toolchains are auto-registered per-platform
+using prebuilt release tarballs.</li>
 <li><strong><code>verible_format_aspect</code></strong> / <strong><code>verible_format_test</code></strong> — check that
 <code>VerilogInfo</code> targets are correctly formatted.</li>
 <li><strong><code>verible_lint_aspect</code></strong> / <strong><code>verible_lint_test</code></strong> — lint <code>VerilogInfo</code>

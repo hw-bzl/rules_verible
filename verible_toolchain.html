@@ -166,18 +166,19 @@
 <pre>
 load("@rules_verible//verible:verible_toolchain.bzl", "verible_toolchain")
 
-verible_toolchain(<a href="#verible_toolchain-name">name</a>, <a href="#verible_toolchain-verible_diff">verible_diff</a>, <a href="#verible_toolchain-verible_format">verible_format</a>, <a href="#verible_toolchain-verible_lint">verible_lint</a>)
+verible_toolchain(<a href="#verible_toolchain-name">name</a>, <a href="#verible_toolchain-verible_diff">verible_diff</a>, <a href="#verible_toolchain-verible_format">verible_format</a>, <a href="#verible_toolchain-verible_lint">verible_lint</a>, <a href="#verible_toolchain-verible_syntax">verible_syntax</a>)
 </pre>
 <p>A toolchain that exposes the <a href="https://github.com/chipsalliance/verible">Verible</a> tools.</p>
 <p>A single instance holds every Verible binary <code>rules_verible</code> knows about
-(<code>verible-verilog-format</code>, <code>verible-verilog-lint</code>, <code>verible-verilog-diff</code>).
-The format, lint, and diff pipelines all consume the same
-<code>//verible:toolchain_type</code> and pull whichever binary they need from the
+(<code>verible-verilog-format</code>, <code>verible-verilog-lint</code>, <code>verible-verilog-diff</code>,
+<code>verible-verilog-syntax</code>). The format, lint, and diff pipelines all consume the
+same <code>//verible:toolchain_type</code> and pull whichever binary they need from the
 resolved <code>ToolchainInfo</code>.</p>
 <p>The rule also provides <code>platform_common.TemplateVariableInfo</code> exposing
-<code>VERIBLE_FORMAT_RLOCATIONPATH</code>, <code>VERIBLE_LINT_RLOCATIONPATH</code>, and
-<code>VERIBLE_DIFF_RLOCATIONPATH</code>, so a downstream <code>cc_binary</code> can reference each
-binary's runfiles key via <code>env = {"VERIBLE_..._RLOCATIONPATH": "$(VERIBLE_..._RLOCATIONPATH)"}</code>.</p>
+<code>VERIBLE_FORMAT_RLOCATIONPATH</code>, <code>VERIBLE_LINT_RLOCATIONPATH</code>,
+<code>VERIBLE_DIFF_RLOCATIONPATH</code>, and <code>VERIBLE_SYNTAX_RLOCATIONPATH</code>, so a
+downstream <code>cc_binary</code> can reference each binary's runfiles key via
+<code>env = {"VERIBLE_..._RLOCATIONPATH": "$(VERIBLE_..._RLOCATIONPATH)"}</code>.</p>
 <p>The default toolchain registered by <code>//verible/toolchain:all</code> points at the
 prebuilt Verible releases for linux x86_64, linux aarch64, macOS, and
 windows x86_64. To override (e.g. point at a vendored or system-installed
@@ -189,6 +190,7 @@ ahead of the defaults in your <code>MODULE.bazel</code>.</p>
 <tr><td style="text-align: left"><a id="verible_toolchain-verible_diff"></a>verible_diff</td><td style="text-align: left">The <code>verible-verilog-diff</code> binary.</td><td style="text-align: left"><a href="https://bazel.build/concepts/labels">Label</a></td><td style="text-align: left">required</td><td style="text-align: left"></td></tr>
 <tr><td style="text-align: left"><a id="verible_toolchain-verible_format"></a>verible_format</td><td style="text-align: left">The <code>verible-verilog-format</code> binary.</td><td style="text-align: left"><a href="https://bazel.build/concepts/labels">Label</a></td><td style="text-align: left">required</td><td style="text-align: left"></td></tr>
 <tr><td style="text-align: left"><a id="verible_toolchain-verible_lint"></a>verible_lint</td><td style="text-align: left">The <code>verible-verilog-lint</code> binary.</td><td style="text-align: left"><a href="https://bazel.build/concepts/labels">Label</a></td><td style="text-align: left">required</td><td style="text-align: left"></td></tr>
+<tr><td style="text-align: left"><a id="verible_toolchain-verible_syntax"></a>verible_syntax</td><td style="text-align: left">The <code>verible-verilog-syntax</code> binary.</td><td style="text-align: left"><a href="https://bazel.build/concepts/labels">Label</a></td><td style="text-align: left">required</td><td style="text-align: left"></td></tr>
 </tbody></table>
 </div>
                     </main>
