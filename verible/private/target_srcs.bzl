@@ -1,6 +1,6 @@
 """Helper for discovering Verilog source files on a `VerilogInfo` target."""
 
-load("@rules_verilog//verilog:defs.bzl", "VerilogInfo")
+load("@rules_verilog//verilog:verilog_info.bzl", "VerilogInfo")
 
 def find_srcs(target, *, include_hdrs = False):
     """Return the direct source files on a `VerilogInfo`-providing target.
