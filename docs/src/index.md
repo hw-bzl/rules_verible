@@ -36,7 +36,7 @@ from [Summary](./SUMMARY.md).
 Add to `MODULE.bazel`:
 
 ```python
-bazel_dep(name = "rules_verilog", version = "1.1.1")
+bazel_dep(name = "rules_verilog", version = "1.4.3")
 bazel_dep(name = "rules_verible", version = "{version}")
 ```
 
