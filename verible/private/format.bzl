@@ -21,8 +21,6 @@ def _rlocationpath(file, workspace_name):
     return "{}/{}".format(workspace_name, file.short_path)
 
 def _verible_format_aspect_impl(target, ctx):
-    if VerilogInfo not in target:
-        return []
     if _has_skip_tag(ctx):
         return []
     srcs = find_srcs(target).to_list()
@@ -67,6 +65,7 @@ verible_format_aspect = aspect(
             default = Label("//verible/private:verible_format_runner"),
         ),
     },
+    required_providers = [VerilogInfo],
     toolchains = [TOOLCHAIN_TYPE],
 )
 
