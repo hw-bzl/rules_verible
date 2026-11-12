@@ -2,7 +2,7 @@
 
 module(
     name = "rules_verible",
-    version = "0.5.0",
+    version = "0.6.0",
     bazel_compatibility = [">=7.5.0"],
 )
 
